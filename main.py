@@ -7,10 +7,10 @@ import itertools
 from Shay_Rozin import bet
 
 reload(logging)
-#LEVEL = logging.INFO
+LEVEL = logging.INFO
 #LEVEL = logging.DEBUG
 
-#logging.basicConfig(level=LEVEL, format="%(levelname)s - %(asctime)s - %(message)s")
+logging.basicConfig(level=LEVEL, format="%(levelname)s - %(asctime)s - %(message)s")
 
 class Game:
     class Urn:
@@ -27,14 +27,13 @@ class Game:
             self.count[is_red] += 1
             return is_red
 
-    def __init__(self, total_tokens, N, K, red1, red2, b):
+    def __init__(self, total_tokens, N, K, red1, red2):
         self.tokens = self.total_tokens = total_tokens
         self.N = N
         self.K = K
         self.urn1 = self.Urn(N, red1)
         self.urn2 = self.Urn(N, red2)
         self.cur_iter = 0
-        self.b = b
 
     def get_urn(self, is_first):
         res_urn = self.urn1 if is_first else self.urn2
@@ -51,7 +50,7 @@ class Game:
             self.cur_iter += 1
             bet_tokens, is_first, bet_is_red = bet(self.N, self.K, self.tokens,
                                                    self.urn1.count[False], self.urn1.count[True],
-                                                   self.urn2.count[False], self.urn2.count[True], self.b)
+                                                   self.urn2.count[False], self.urn2.count[True])
             cur_urn = self.get_urn(is_first)
             result_is_red = self.get_ball(bet_is_red, is_first, bet_tokens)
             bet_factor = 1 if result_is_red == bet_is_red else -1
@@ -68,29 +67,16 @@ class Game:
         return self.tokens
 
 #Note that this function support small values of N as it runs over all combinations
-def get_worst_case(M, N, K, b):
+def get_worst_case(M, N, K):
     assert N < 10, "only small values of N are supported"
     min_val = math.inf
     for sub1 in itertools.combinations(range(N),K):
         for sub2 in itertools.combinations(range(N),N-K):
             for pair in [(sub1,sub2), (sub2,sub1)]:
-                min_val = min(min_val, Game(M, N, K, pair[0], pair[1], b).run())
+                min_val = min(min_val, Game(M, N, K, pair[0], pair[1]).run())
 
     logging.info(f"M:{M}, N:{N}, K:{K} - {min_val}")
     return min_val
 
 if __name__ == '__main__':
-    xs = [x * 0.1 for x in range(90, 101)]
-    maxi = 0
-    maxav = 0
-    for i in xs:
-        av = 0
-        index = 0
-        for k in range(1, 10):
-            for j in range(0, k+1):
-                av += get_worst_case(1000, k, j, i)
-                index += 1
-        av = av/index
-        maxi = i if av >= maxav else maxi
-        maxav = av if av >= maxav else maxav
-        print(maxi, maxav, i)
+    get_worst_case(1000, 5, 3)

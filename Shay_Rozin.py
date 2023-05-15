@@ -3,9 +3,9 @@ def prob_red_from_urn(N, K, g, r):
     k1 = K - r
     k2 = K - g
     py = 0.5
-    if g > K or r > N-K:
+    if g > K or r > N - K:
         py = 1
-    if r > K or g > N-K:
+    if r > K or g > N - K:
         py = 0
     px_given_1 = 0 if n == 0 else py * k1 / n
     px_given_2 = 0 if n == 0 else (1 - py) * (n - k2) / n
@@ -14,22 +14,22 @@ def prob_red_from_urn(N, K, g, r):
 
 
 def prob_red_from_1_urn(N, K, g, r):
-    px = (K-r)/(N-g-r)
+    px = (K - r) / (N - g - r)
     return px
 
 
 def calc_tokens(p, m):
-    f = 2 * p - 1
+    f = 2*p - 1
     v = min(max(f * m, 1), m)
     return round(v)
 
 
-def bet(N, K, m, g1, r1, g2, r2,b):
+def bet(N, K, m, g1, r1, g2, r2):
     if N == g1 + r1:
         if g1 == K:
             p_r2 = prob_red_from_1_urn(N, K, g2, r2)
         else:
-            p_r2 = prob_red_from_1_urn(N, N-K, g2, r2)
+            p_r2 = prob_red_from_1_urn(N, N - K, g2, r2)
     else:
         p_r2 = prob_red_from_urn(N, K, g2, r2)
 
@@ -63,3 +63,4 @@ def bet(N, K, m, g1, r1, g2, r2,b):
         return (calc_tokens(p_g1, m), True, False)
     if maxi == p_g2:
         return (calc_tokens(p_g2, m), False, False)
+
